@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
   function RenderLeader({leader}) {     
     return(
-      <Media tag="li" className="mb-4">
+      <Media tag="li" className="mt-4">
       <Media left middle>
          <Media object src = {leader.image} alt={leader.name}/>
       </Media>
@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
               <Media heading>{leader.name}</Media>
               <h7>{leader.designation}</h7>
               <div className = "m-2"></div>
-              <p>{leader.description}</p>
+              <p className="d-none d-md-block">{leader.description}</p>
       </Media>
    </Media>
 
