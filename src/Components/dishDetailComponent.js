@@ -1,13 +1,93 @@
-import React from 'react';
+import React, { Fragment, Component } from 'react';
 import { Card, CardImg, CardText, CardBody,
-    CardTitle, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+    CardTitle, Breadcrumb, BreadcrumbItem,Button,Modal,ModalBody,ModalHeader,Col, Row, Label} from 'reactstrap';
 import { Link } from 'react-router-dom';
+import {Control, LocalForm, Errors} from 'react-redux-form';
+
+const required = (val) => val && val.length;
+const maxLength = (len) => (val) => !(val) || (val.length <= len);
+const minLength = (len) => (val) => val && (val.length >= len);
+
+class CommentForm extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            isModalOpen: false
+        }
+        this.toggleComments=this.toggleComments.bind(this);
+    }
+    toggleComments(){
+       this.setState({
+           isModalOpen: !this.state.isModalOpen
+       });
+    }
+
+    handleSubmit(values){
+         alert("current state is:" + JSON.stringify(values));
+    }
+
+   render(){
+       return(
+       <div>
+           <Button outline light onClick={this.toggleComments} className="ml-4"><span className="fa fa-pencil"></span> Submit Comment</Button>
+       <Modal isOpen={this.state.isModalOpen} toggle={this.toggleComments}>
+           <ModalHeader toggle={this.toggleComments}>Submit Comment</ModalHeader>
+           <ModalBody>
+             <LocalForm onSubmit={(values)=>this.handleSubmit(values)}>
+                 <Row> 
+                     <Label htmlFor="rating" md={12}>Rating</Label>
+                     <Col md={12}>
+                         <Control.select model=".rating" id="rating" name="rating" className="form-control">
+                             <option>1</option>
+                             <option>2</option>
+                             <option>3</option>
+                             <option>4</option>
+                             <option>5</option>
+                         </Control.select>
+                     </Col>
+                 </Row>
+                 <Row>
+                 <Label htmlFor="author" md={12}>Your Name</Label>
+                     <Col md={12}>
+                         <Control.text model=".author" id="author" name="author" className="form-control"
+                        validators={{
+                            required,minLength:minLength(3),maxLength:maxLength(15)
+                        }}
+                         />
+                         <Errors
+                         className="text-danger"
+                         model=".author"
+                         messages={{
+                             required:'required ',
+                             minLength:'Must be greater than 2 characters',
+                             maxLength:'must be 15 characters or less'
+                         }
+                         }
+                         />
+                     </Col>  
+                 </Row>
+                 <Row>
+                 <Label htmlFor="comment" md={12}>Comment</Label>
+                     <Col md={12}>
+                         <Control.textarea
+                         model=".comment" id="comment" name="comment" className="form-control" rows={6}/>
+                     </Col>
+                 </Row>
+                 <Button type="submit" color="primary" className="mt-3">Submit</Button>
+             </LocalForm>
+           </ModalBody>
+       </Modal>
+       </div>
+       );
+   }
+}
 
    function RenderComments({comments}) {
         if (comments == null) {return(<div></div>);}
         const cmnts = comments.map(dishComment => {
             return (
-                <li key={dishComment.id}>
+              <div>
+                  <li key={dishComment.id}>
                     <p>{dishComment.comment}</p>
                     <p>-- {dishComment.author},
                     &nbsp;
@@ -18,6 +98,7 @@ import { Link } from 'react-router-dom';
                         }).format(new Date(dishComment.date))}
                     </p>
                 </li>
+              </div> 
             );
         });
         return (
@@ -47,6 +128,7 @@ import { Link } from 'react-router-dom';
     const DishDetail = (props) => {
         if (props.dish != null){
             return (
+                <>
                 <div className="container">
                 <div className="row">
                     <Breadcrumb>
@@ -64,9 +146,11 @@ import { Link } from 'react-router-dom';
                     </div>
                     <div className="col-12 col-md-5 m-1">
                         <RenderComments comments={props.comments} />
+                        <CommentForm/>
                     </div>
                 </div>
                 </div>
+                </>
             );
         } 
         else{return(<div></div>);} 
